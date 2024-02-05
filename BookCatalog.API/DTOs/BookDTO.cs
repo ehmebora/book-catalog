@@ -1,6 +1,6 @@
-﻿namespace BookCatalog.API
+﻿namespace BookCatalog.API.DTOs
 {
-    public class BookDTO
+    public class BookDTO : BaseEntityDTO
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;

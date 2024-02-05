@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using BookEntity = Domain.Entities.Book;
 
 namespace Application.Book.Commands
 {

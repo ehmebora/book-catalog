@@ -1,5 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.Book.Commands;
+using Application.Category.Handlers.CommandHandlers;
+using FluentValidation;
 using MediatR;
 using BookEntity = Domain.Entities.Book;
 
@@ -16,6 +18,10 @@ namespace Application.Book.Handlers.CommandHandlers
         }
         public async Task<BookEntity> Handle(CreateBook request, CancellationToken cancellationToken)
         {
+
+            CreateBookValidator validator = new CreateBookValidator();
+            validator.ValidateAndThrow(request);
+
             var book = new BookEntity()
             {
                 CategoryId = request.CategoryId,

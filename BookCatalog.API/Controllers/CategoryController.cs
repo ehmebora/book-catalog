@@ -8,7 +8,7 @@ namespace BookCatalog.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoryController : BaseController
     {
         [HttpGet]
         public async Task<ActionResult<IList<Category>>> GetAll(IMediator mediator)

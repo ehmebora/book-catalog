@@ -1,6 +1,6 @@
 ﻿using Application.Book.Commands;
 using Application.Book.Queries;
-using Application.Category.Commands;
+using BookCatalog.API.DTOs;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,7 @@ namespace BookCatalog.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BookController : ControllerBase
+    public class BookController : BaseController
     {
         [HttpGet]
         public async Task<ActionResult<IList<Book>>> GetAll(IMediator mediator)
