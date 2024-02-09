@@ -1,6 +1,8 @@
-﻿using Application.Abstractions;
+﻿using Application;
+using Application.Abstractions;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories
 {
@@ -33,9 +35,41 @@ namespace Infrastructure.Repositories
 
         }
 
-        public async Task<IList<Category>> GetAll()
+        public async Task<PagedList<Category>> GetAll(string? searchTerm,
+                                                  string? sortColumn,
+                                                  string? sortOrder,
+                                                  int page, 
+                                                  int pageSize)
         {
-            return await _dbContext.Category.ToListAsync();
+            IQueryable<Category> categoryQuery = _dbContext.Category;
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                categoryQuery = categoryQuery.Where(c => c.Name.Contains(searchTerm));
+            }
+
+            if (sortOrder?.ToLower() == "desc")
+            {
+                categoryQuery = categoryQuery.OrderByDescending(GetSortProperty(sortColumn));
+            }
+            else
+            {
+                categoryQuery = categoryQuery.OrderBy(GetSortProperty(sortColumn)); 
+            }
+
+            var categories = await PagedList<Category>.CreateAsync(categoryQuery, page, pageSize);
+              
+
+            return categories;
+        }
+
+        private static Expression<Func<Category, object>> GetSortProperty(string? sortColumn)
+        {
+            return sortColumn?.ToLower() switch
+            {
+                "name" => category => category.Name,
+                _ => category => category.ID
+            };
         }
 
         public async Task<Category> GetCategoryById(int id)

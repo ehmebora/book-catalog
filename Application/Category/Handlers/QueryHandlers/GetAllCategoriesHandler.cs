@@ -6,7 +6,7 @@ using CategoryEntity = Domain.Entities.Category;
 
 namespace Application.Category.Handlers.QueryHandlers
 {
-    public class GetAllCategoriesHandler : IRequestHandler<GetAllCategories, IList<CategoryEntity>>
+    public class GetAllCategoriesHandler : IRequestHandler<GetAllCategories, PagedList<CategoryEntity>>
     {
         private readonly ICategoryRepository _repository;
 
@@ -14,9 +14,9 @@ namespace Application.Category.Handlers.QueryHandlers
         {
             _repository = repository;
         }
-        public Task<IList<CategoryEntity>> Handle(GetAllCategories request, CancellationToken cancellationToken)
+        public Task<PagedList<CategoryEntity>> Handle(GetAllCategories request, CancellationToken cancellationToken)
         {
-            return _repository.GetAll();
+            return _repository.GetAll(request.SearchTerm, request.SortColumn, request.SortOrder, request.Page, request.PageSize);
         }
     }
 }

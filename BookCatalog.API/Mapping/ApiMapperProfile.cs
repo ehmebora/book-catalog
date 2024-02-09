@@ -10,27 +10,13 @@ namespace BookCatalog.API.Mapping
     {
         public ApiMapperProfile()
         {
-            InitMapping();
+            InitBookMapping();
         }
 
-        private void InitMapping()
+        private void InitBookMapping()
         {
-            CreateMap<BaseEntityDTO, BaseEntity>()
-                .ReverseMap();
-
-
-            CreateMap<BookDTO, Book>()
-                .IncludeBase<BaseEntityDTO, BaseEntity>()
-                .ForMember(dest => dest.Category, opt => opt.Ignore());
-
-            CreateMap<Book, BookDTO>();
-
-
-            CreateMap<CategoryDTO, Category>()
-                .IncludeBase<BaseEntityDTO, BaseEntity>();
-
-            CreateMap<Category, CategoryDTO>();
-
+            CreateMap<BookDTO, CreateBook>().ReverseMap();
+            CreateMap<BookDTO, UpdateBook>().ReverseMap();
         }
     }
 }

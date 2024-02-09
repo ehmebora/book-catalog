@@ -4,3 +4,14 @@ GET {{BookCatalog.API_HostAddress}}/api/category
 Accept: application/json
 
 ###
+
+DELETE {{BookCatalog.API_HostAddress}}/api/book/0
+
+###
+
+PUT {{BookCatalog.API_HostAddress}}/api/category/1
+Content-Type: application/json
+
+""
+
+###

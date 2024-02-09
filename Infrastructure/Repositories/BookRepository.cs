@@ -1,6 +1,8 @@
-﻿using Application.Abstractions;
+﻿using Application;
+using Application.Abstractions;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories
 {
@@ -41,22 +43,66 @@ namespace Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IList<Book>> GetAll()
+        public async Task<PagedList<Book>> GetAll(string? searchTerm,
+                                                  string? sortColumn,
+                                                  string? sortOrder,
+                                                  int page,
+                                                  int pageSize)
         {
-            return await _dbContext.Book.ToListAsync();
+            IQueryable<Book> bookQuery = _dbContext.Book;
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                bookQuery = bookQuery.Where(c => c.Title.Contains(searchTerm) || c.Description.Contains(searchTerm));
+            }
+
+            if (sortOrder?.ToLower() == "desc")
+            {
+                bookQuery = bookQuery.OrderByDescending(GetSortProperty(sortColumn));
+            }
+            else
+            {
+                bookQuery = bookQuery.OrderBy(GetSortProperty(sortColumn));
+            }
+
+            var books = await PagedList<Book>.CreateAsync(bookQuery, page, pageSize);
+
+
+            return books;
         }
 
-        public async Task<IList<Book>> GetAllByCategoryId(int categoryId)
+        public async Task<PagedList<Book>> GetAllByCategoryId(int categoryId,
+                                                          string? searchTerm,
+                                                          string? sortColumn,
+                                                          string? sortOrder,
+                                                          int page,
+                                                          int pageSize)
         {
             var category = await _dbContext.Category.FindAsync(categoryId);
 
             if (category is null)
                 throw new Exception($"Could not find book category. Category ID: {categoryId}");
 
-            var books = await _dbContext.Book
-                        .Where(b => b.CategoryId == categoryId)
-                        .Include(b => b.Category)
-                        .ToListAsync();
+            IQueryable<Book> bookQuery = _dbContext.Book
+                .Where(b => b.CategoryId == categoryId)
+                .Include(b => b.Category);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                bookQuery = bookQuery.Where(c => c.Title.Contains(searchTerm) || c.Description.Contains(searchTerm));
+            }
+
+            if (sortOrder?.ToLower() == "desc")
+            {
+                bookQuery = bookQuery.OrderByDescending(GetSortProperty(sortColumn));
+            }
+            else
+            {
+                bookQuery = bookQuery.OrderBy(GetSortProperty(sortColumn));
+            }
+
+            var books = await PagedList<Book>.CreateAsync(bookQuery, page, pageSize);
+
 
             return books;
         }
@@ -96,6 +142,16 @@ namespace Infrastructure.Repositories
             _dbContext.Entry(book).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
             return book;
+        }
+
+        private static Expression<Func<Book, object>> GetSortProperty(string? sortColumn)
+        {
+            return sortColumn?.ToLower() switch
+            {
+                "title" => book => book.Title,
+                "publishDate" => book => book.PublicDateUtc,
+                _ => book => book.ID
+            };
         }
     }
 }

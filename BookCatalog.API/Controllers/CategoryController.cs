@@ -11,9 +11,15 @@ namespace BookCatalog.API.Controllers
     public class CategoryController : BaseController
     {
         [HttpGet]
-        public async Task<ActionResult<IList<Category>>> GetAll(IMediator mediator)
+        public async Task<ActionResult<IList<Category>>> GetAll(IMediator mediator,
+            string? searchTerm,
+            string? sortColumn,
+            string? sortOrder,
+            int page = 1,
+            int pageSize = 5)
         {
-            var categories = await mediator.Send(new GetAllCategories() { });
+            var query = new GetAllCategories(searchTerm, sortColumn, sortOrder, page, pageSize);
+            var categories = await mediator.Send(query);
             return Ok(categories);
         }
 

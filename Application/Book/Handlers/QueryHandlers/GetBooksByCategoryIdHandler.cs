@@ -5,7 +5,7 @@ using BookEntity = Domain.Entities.Book;
 
 namespace Application.Book.Handlers.QueryHandlers
 {
-    public class GetBooksByCategoryIdHandler : IRequestHandler<GetBooksByCategoryId, IList<BookEntity>>
+    public class GetBooksByCategoryIdHandler : IRequestHandler<GetBooksByCategoryId, PagedList<BookEntity>>
     {
         private readonly IBookRepository _repository;
 
@@ -13,9 +13,9 @@ namespace Application.Book.Handlers.QueryHandlers
         {
             _repository = repository;
         }
-        public Task<IList<BookEntity>> Handle(GetBooksByCategoryId request, CancellationToken cancellationToken)
+        public async Task<PagedList<BookEntity>> Handle(GetBooksByCategoryId request, CancellationToken cancellationToken)
         {
-            return _repository.GetAllByCategoryId(request.CategoryId);
+            return await _repository.GetAllByCategoryId(request.CategoryId, request.SearchTerm, request.SortColumn, request.SortOrder, request.Page, request.PageSize);
         }
     }
 }

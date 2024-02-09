@@ -3,7 +3,7 @@
     using Domain.Entities;
     public interface ICategoryRepository
     {
-        Task<IList<Category>> GetAll();
+        Task<PagedList<Category>> GetAll(string? searchTerm, string? sortColumn, string? sortOrder, int page, int pageSize);
 
         Task<Category> GetCategoryById(int id);
 
